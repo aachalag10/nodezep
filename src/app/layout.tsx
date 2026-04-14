@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TRPCReactProvider } from "@/trpc/client";
 import { TooltipProvider } from "@/components/ui/tooltip";
-
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +32,9 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           <TooltipProvider>
-        {children}
-        </TooltipProvider>
+            {children}
+            <Toaster />
+          </TooltipProvider>
         </TRPCReactProvider>
       </body>
     </html>
