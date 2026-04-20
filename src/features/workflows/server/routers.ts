@@ -35,6 +35,7 @@ export const workflowsRouter = createTRPCRouter({
         data: { name: input.name },
       });
     }),
+
   getMany: protectedProcedure
     .input(
       z.object({
