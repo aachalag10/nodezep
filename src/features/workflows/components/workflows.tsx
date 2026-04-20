@@ -5,6 +5,7 @@ import {
   EntityHeader,
   EntityPagination,
   EntitySearch,
+  LoadingView,
 } from "@/components/entity-components";
 import {
   useCreateWorkflow,
@@ -101,4 +102,8 @@ export const WorkflowsContainer = ({
       {children}
     </EntityContainer>
   );
+};
+
+export const Workflows = () => {
+  return <LoadingView entity="workflows" />;
 };
