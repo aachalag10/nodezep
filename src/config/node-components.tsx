@@ -1,8 +1,9 @@
 import { NodeType } from "@/generated/prisma/enums";
 import type { NodeTypes } from "@xyflow/react";
+import { InitialNode } from "@/components/initial-nodes";
 
-export const nodeComponents={
-    [NodeType.INITIAL]:InitialNode,
-}as const satisfies NodeTypes;
+export const nodeComponents = {
+  [NodeType.INITIAL]: InitialNode,
+} as const satisfies NodeTypes;
 
-export type RegisteredNodeType=keyof typeof nodeComponents;
+export type RegisteredNodeType = keyof typeof nodeComponents;

@@ -9,7 +9,7 @@ import {
   type NodeProps,
 } from "@xyflow/react";
 
-import { BaseNode } from "@/components/base-node";
+import { BaseNode } from "./base-node";
 
 export type PlaceholderNodeProps = Partial<NodeProps> & {
   children?: ReactNode;
