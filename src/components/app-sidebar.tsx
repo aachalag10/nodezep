@@ -24,9 +24,6 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "./ui/sidebar";
-import { title } from "process";
-import { ur } from "zod/v4/locales";
-import { group } from "console";
 import { authClient } from "@/lib/auth-client";
 import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscription";
 
