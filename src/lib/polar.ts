@@ -1,6 +1,6 @@
 import { Polar } from "@polar-sh/sdk";
 
-export const PolarClient = new Polar({
+export const polarClient = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN!,
   server: "sandbox", //todo:change to production
 });

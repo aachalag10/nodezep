@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { PolarClient } from "@/lib/polar";
+import { polarClient } from "@/lib/polar";
 import superjson from "superjson";
 
 export const createTRPCContext = cache(async () => {
@@ -41,7 +41,7 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
 export const PremiumProcedure = protectedProcedure.use(
   async ({ ctx, next }) => {
     // ✅ Use the Polar SDK client, NOT the Better Auth plugin
-    const customer = await PolarClient.customers.getStateExternal({
+    const customer = await polarClient.customers.getStateExternal({
       externalId: ctx.auth.user.id,
     });
 

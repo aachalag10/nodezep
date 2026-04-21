@@ -11,6 +11,7 @@ import {
   ErrorView,
   LoadingView,
 } from "@/components/entity-components";
+
 import {
   useCreateWorkflow,
   useRemoveWorkflow,
@@ -65,9 +66,9 @@ export const WorkflowsHeader = ({ disabled }: { disabled?: boolean }) => {
         // no need to do anything here, the onSuccess callback in the hook will handle everything
         router.push(`/workflows/${data.id}`);
       },
-      // onError: (error) => {
-      //   handleError(error);
-      // },
+      onError: (error) => {
+        handleError(error);
+      },
     });
   };
   return (
