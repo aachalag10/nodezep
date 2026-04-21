@@ -19,6 +19,7 @@ import {
   applyEdgeChanges,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { nodeComponents } from "@/config/node-components";
 
 export const EditorLoading = () => {
   return <LoadingView message="Loading editor..." />;
@@ -65,6 +66,7 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        nodeTypes={nodeComponents}
         fitView
         // proOptions={{hideAttribution:true}}
         //for the logo at right bottom to disappear
