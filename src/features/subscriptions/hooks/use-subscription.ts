@@ -18,7 +18,7 @@ export const useHasActiveSubscription = () => {
   const hasActiveSubscription =
     customerState?.activeSubscriptions &&
     customerState.activeSubscriptions.length > 0;
-
+  console.log(customerState);
   return {
     hasActiveSubscription,
     subscription: customerState?.activeSubscriptions?.[0],

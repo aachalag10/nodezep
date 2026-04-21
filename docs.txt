@@ -5,3 +5,15 @@
 https://sandbox.polar.sh/dashboard/nodezep-production
 
 npx prisma studio---to open database
+
+routers.ts
+ // create: PremiumProcedure.mutation(({ ctx }) => {
+
+
+
+workflows.tsx----WorkflowsHeader
+ // onError: (error) => {
+      //   handleError(error);
+      // },
+
+//uncomment this 2 lines for payment procedure
