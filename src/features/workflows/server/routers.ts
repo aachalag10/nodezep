@@ -5,25 +5,24 @@ import {
   PremiumProcedure,
   protectedProcedure,
 } from "@/trpc/init";
-import { z } from "zod";
+import { positive, z } from "zod";
 import { PAGINATION } from "@/config/constants";
-import type {Node,Edge} from "@xyflow/react";
+import { type Node, type Edge, Position } from "@xyflow/react";
 import { NodeType } from "@/generated/prisma/enums";
 
 export const workflowsRouter = createTRPCRouter({
   create: PremiumProcedure.mutation(({ ctx }) => {
-  
     return prisma.workflow.create({
       data: {
         name: generateSlug(3),
         userId: ctx.auth.user.id,
-        nodes:{
-          create:{
-            type:NodeType.INITIAL,
-            position:{x:0,y:0},
-            name:NodeType.INITIAL,
-          }
-        }
+        nodes: {
+          create: {
+            type: NodeType.INITIAL,
+            position: { x: 0, y: 0 },
+            name: NodeType.INITIAL,
+          },
+        },
       },
     });
   }),
@@ -37,6 +36,80 @@ export const workflowsRouter = createTRPCRouter({
         },
       });
     }),
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        nodes: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string().nullish(),
+            position: z.object({ x: z.number(), y: z.number() }),
+            data: z.record(z.string(), z.any()).optional(),
+          }),
+        ),
+        edges: z.array(
+          z.object({
+            source: z.string(),
+            target: z.string(),
+            sourceHandle: z.string().nullish(),
+            targetHandle: z.string().nullish(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, nodes, edges } = input;
+
+      const workflow = await prisma.workflow.findUnique({
+        where: {
+          id,
+          userId: ctx.auth.user.id,
+        },
+      });
+
+      //Transaction to ensure consistency
+      return await prisma.$transaction(async (tx) => {
+        //delete exisitng nodes and connections
+        await tx.node.deleteMany({
+          where: {
+            workflowId: id,
+          },
+        });
+
+        //create nodes
+        await tx.node.createMany({
+          data: nodes.map((node) => ({
+            id: node.id,
+            workflowId: id,
+            name: node.type || "unknown",
+            type: node.type as NodeType,
+            position: node.position,
+            data: node.data || {},
+          })),
+        });
+        //create connections
+
+        await tx.connection.createMany({
+          data: edges.map((edge) => ({
+           workflowId: id,
+           fromNodeId: edge.source,
+           toNodeId: edge.target,
+           fromOutput: edge.sourceHandle || "main",
+           toInput: edge.targetHandle || "main",
+          })),
+        });
+
+        //Update workflow's updateAt timestamp
+        await tx.workflow.update({
+          where: { id },
+          data: { updatedAt: new Date() },
+        });
+
+        return workflow;
+      });
+    }),
+
   updatedName: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(1) }))
     .mutation(({ ctx, input }) => {
@@ -48,40 +121,40 @@ export const workflowsRouter = createTRPCRouter({
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const workflow=await prisma.workflow.findUniqueOrThrow({
+      const workflow = await prisma.workflow.findUniqueOrThrow({
         where: {
           id: input.id,
           userId: ctx.auth.user.id,
         },
-        include:{
-          nodes:true,
-          connections:true,
-        }
+        include: {
+          nodes: true,
+          connections: true,
+        },
       });
 
       //Transform server-nodes to react-flow compatible nodes
-      const nodes:Node[]=workflow.nodes.map((node)=>({
-        id:node.id,
-        type:node.type,
-        data:(node.data as Record<string,unknown>)||{},
-        position:node.position as {x:number,y:number},
-      }))
+      const nodes: Node[] = workflow.nodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        data: (node.data as Record<string, unknown>) || {},
+        position: node.position as { x: number; y: number },
+      }));
 
       //Transform server-connections to react-flow compatible edges
-      const edges:Edge[]=workflow.connections.map((connection)=>({
-        id:connection.id,
-        source:connection.fromNodeId,
-        target:connection.toNodeId,
-        sourceHandle:connection.fromOutput,
-        targetHandle:connection.toInput,
-      }))
+      const edges: Edge[] = workflow.connections.map((connection) => ({
+        id: connection.id,
+        source: connection.fromNodeId,
+        target: connection.toNodeId,
+        sourceHandle: connection.fromOutput,
+        targetHandle: connection.toInput,
+      }));
 
-      return { 
-        id:workflow.id,
-        name:workflow.name,
+      return {
+        id: workflow.id,
+        name: workflow.name,
         nodes,
         edges,
-       };
+      };
     }),
 
   getMany: protectedProcedure
