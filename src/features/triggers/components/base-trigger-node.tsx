@@ -8,12 +8,17 @@ import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
 import { WorkflowNode } from "@/components/workflow-node";
 import { BaseHandle } from "@/components/react-flow/base-handle";
 import { BaseExecutionNode } from "@/features/executions/components/base-execution-node";
+import {
+  NodeStatus,
+  NodeStatusIndicator,
+} from "@/components/react-flow/node-status-indicator";
 
 interface BaseTriggerNodeProps extends NodeProps {
   icon: LucideIcon | string;
   name: string;
   description?: string;
   children?: ReactNode;
+  status?: NodeStatus;
   onSettings?: () => void;
   onDoubleClick?: () => void;
 }
@@ -25,21 +30,23 @@ export const BaseTriggerNode = memo(
     name,
     description,
     children,
+    status = "initial",
     onSettings,
     onDoubleClick,
   }: BaseTriggerNodeProps) => {
-
-    const {setNodes,setEdges}=useReactFlow();
+    const { setNodes, setEdges } = useReactFlow();
 
     //TODO:add delete method
     const handleDelete = () => {
-      setNodes((currentNodes)=>{
-        const updatedNodes=currentNodes.filter((node)=>node.id!==id);
+      setNodes((currentNodes) => {
+        const updatedNodes = currentNodes.filter((node) => node.id !== id);
         return updatedNodes;
       });
 
-      setEdges((currentEdges)=>{
-        const updatedEdges=currentEdges.filter((edge)=>edge.source!==id && edge.target!==id);
+      setEdges((currentEdges) => {
+        const updatedEdges = currentEdges.filter(
+          (edge) => edge.source !== id && edge.target !== id,
+        );
         return updatedEdges;
       });
     };
@@ -51,27 +58,31 @@ export const BaseTriggerNode = memo(
         onDelete={handleDelete}
         onSettings={onSettings}
       >
-        {/* TODO:Wrap within NodeStatusIndicator */}
-
-        <BaseNode onDoubleClick={onDoubleClick} className="rounded-l-2xl relative group">
-          <BaseNodeContent>
-            {typeof Icon === "string" ? (
-              <Image 
-              src={Icon} 
-              alt={name} 
-              width={16} 
-              height={16} />
-            ) : (
-              <Icon className="size-4 text-muted-foreground" />
-            )}
-            {children}
-            <BaseHandle 
-            id="source-1" 
-            type="source" 
-            position={Position.Right} 
-            />
-          </BaseNodeContent>
-        </BaseNode>
+        <NodeStatusIndicator
+          status={status}
+          variant="border"
+          className="rounded-l-2xl"
+        >
+          <BaseNode
+            status={status}
+            onDoubleClick={onDoubleClick}
+            className="rounded-l-2xl relative group"
+          >
+            <BaseNodeContent>
+              {typeof Icon === "string" ? (
+                <Image src={Icon} alt={name} width={16} height={16} />
+              ) : (
+                <Icon className="size-4 text-muted-foreground" />
+              )}
+              {children}
+              <BaseHandle
+                id="source-1"
+                type="source"
+                position={Position.Right}
+              />
+            </BaseNodeContent>
+          </BaseNode>
+        </NodeStatusIndicator>
       </WorkflowNode>
     );
   },
