@@ -4,7 +4,7 @@ import {
   PlusIcon,
   SearchIcon,
   MoreVerticalIcon,
-  TrashIcon
+  TrashIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -276,15 +276,14 @@ export const EntityItem = ({
     e.preventDefault();
     e.stopPropagation();
 
-    if(isRemoving){
+    if (isRemoving) {
       return;
     }
-
 
     if (onRemove) {
       await onRemove();
     }
-  }
+  };
 
   return (
     <>
@@ -299,40 +298,39 @@ export const EntityItem = ({
           <CardContent className="flex flex-row items-center justify-between p-0">
             <div className="flex  items-center gap-3">
               {image}
-              
+
               <div>
                 <CardTitle className="text-base font-medium">{title}</CardTitle>
-                {!!subtitle && (
-                  <CardDescription>{subtitle}</CardDescription>
+                {!!subtitle && <CardDescription>{subtitle}</CardDescription>}
+              </div>
+            </div>
+            {(actions || onRemove) && (
+              <div className="flex gap-x-4 items-center">
+                {actions}
+                {onRemove && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => e.stopPropagation}
+                      >
+                        <MoreVerticalIcon className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <DropdownMenuItem onClick={handleRemove}>
+                        <TrashIcon className="size-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
               </div>
-              </div>
-              {(actions || onRemove) && (
-                <div className="flex gap-x-4 items-center">
-                  {actions}
-                  {onRemove && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={(e)=>e.stopPropagation}
-                          >
-                            <MoreVerticalIcon className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" onClick={(e)=>e.stopPropagation()}>
-                          <DropdownMenuItem onClick={handleRemove}>
-                            <TrashIcon className="size-4"/>
-                            Delete
-                          </DropdownMenuItem>
-
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                </div>
-              
-              )}
+            )}
           </CardContent>
         </Card>
       </Link>

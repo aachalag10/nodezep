@@ -17,7 +17,7 @@ import {
   type Connection,
   applyNodeChanges,
   applyEdgeChanges,
-  Panel
+  Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { nodeComponents } from "@/config/node-components";
@@ -43,24 +43,26 @@ const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 export const Editor = ({ workflowId }: { workflowId: string }) => {
   const { data: workflow } = useSuspenseWorkflow(workflowId);
 
-  const setEditor=useSetAtom(editorAtom);
+  const setEditor = useSetAtom(editorAtom);
 
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
   const [edges, setEdges] = useState<Edge[]>(workflow.edges);
 
-
   const onNodesChange = useCallback(
-    (changes:NodeChange[])=>setNodes((nodesSnapshot)=>applyNodeChanges(changes,nodesSnapshot)),
+    (changes: NodeChange[]) =>
+      setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
     [],
   );
 
   const onEdgesChange = useCallback(
-    (changes:EdgeChange[])=>setEdges((edgesSnapshot)=>applyEdgeChanges(changes,edgesSnapshot)),
+    (changes: EdgeChange[]) =>
+      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
     [],
   );
 
   const onConnect = useCallback(
-    (params:Connection) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+    (params: Connection) =>
+      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
     [],
   );
 
@@ -75,22 +77,21 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
         nodeTypes={nodeComponents}
         onInit={setEditor}
         fitView
-        snapGrid={[10,10]}
+        snapGrid={[10, 10]}
         snapToGrid
         panOnScroll
         panOnDrag={false}
         selectionOnDrag
         // proOptions={{hideAttribution:true}}
         //for the logo at right bottom to disappear
-      > 
-      <Background />   
-      <Controls />  
-      <MiniMap />
-      <Panel position="top-right">
-      <AddNodeButton/>
-      </Panel>
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+        <Panel position="top-right">
+          <AddNodeButton />
+        </Panel>
       </ReactFlow>
     </div>
   );
 };
-

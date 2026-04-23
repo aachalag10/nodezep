@@ -1,38 +1,34 @@
 "use client";
 
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-
-interface Props{
-    open:boolean,
-    onOpenChange:(open:boolean)=>void;
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export const ManualTriggerDialog=({
-    open,
-    onOpenChange
-}:Props)=>{
-    return(
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Manual Trigger</DialogTitle>
-                    <DialogDescription>
-                        Configure settings for the manual Trigger Node
-                    </DialogDescription>
-                </DialogHeader>
-                <div  className="py-4">
-                    <p className="text-sm text-muted-foreground">Manual Trigger</p>
-                </div>
-            </DialogContent>
-
-        </Dialog>
-    )
-
-}
+export const ManualTriggerDialog = ({ open, onOpenChange }: Props) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Manual Trigger</DialogTitle>
+          <DialogDescription>
+            Configure settings for the manual Trigger Node
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4">
+          <p className="text-sm text-muted-foreground">
+            Used to manually trigger a workflow,no configurations available.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
