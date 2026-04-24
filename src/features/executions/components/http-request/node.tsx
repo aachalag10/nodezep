@@ -9,6 +9,7 @@ import {  HttpRequestDialog, HTTPRequestFormValues } from "./dialog";
 import { methods } from "better-auth/client";
 
 type HTTPRequestNodeData = {
+  variableName?:string;
   endpoint?: string;
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   body?: string;
