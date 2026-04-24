@@ -7,7 +7,6 @@ import { memo, type ReactNode } from "react";
 import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
 import { WorkflowNode } from "@/components/workflow-node";
 import { BaseHandle } from "@/components/react-flow/base-handle";
-import { BaseExecutionNode } from "@/features/executions/components/base-execution-node";
 import {
   NodeStatus,
   NodeStatusIndicator,

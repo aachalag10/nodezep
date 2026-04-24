@@ -1,23 +1,47 @@
 // src/inngest/functions.ts
+import { NonRetriableError } from "inngest";
 import { inngest } from "./client";
 import prisma from "@/lib/db";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { TopologicalSort } from "./utils";
+import { NodeType } from "@/generated/prisma/enums";
+import { getExecutor } from "@/features/executions/lib/executor-registry";
 
-const google = createGoogleGenerativeAI();
-export const execute = inngest.createFunction(
+
+export const executeWorkflow = inngest.createFunction(
   {
-    id: "execute-ai",
-    triggers: { event: "app/execute/ai" },
+    id: "execute-workflow",
+    triggers: { event: "workflows/execute.workflow" },
   },
   async ({ event, step }) => {
-    await step.sleep("pretend", "5s");
+    const workflowId=event.data.workflowId;
 
-    const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
-      model: google("gemini 2.5 flash"),
-      system: "You are a helpful assistant",
-      prompt: "What is",
+    if(!workflowId){
+      throw new NonRetriableError("Workflow ID is missing");
+    }
+   const sortedNodes=await step.run("prepare-workflow",async()=>{
+    const workflow=await prisma.workflow.findUniqueOrThrow({
+      where:{id:workflowId},
+      include:{
+        nodes:true,
+        connections:true,
+      }
     });
-    return steps;
+    return TopologicalSort(workflow.nodes,workflow.connections);
+    });
+
+    //Initialize the context with any initial data from the trigger
+    let context:event.data.initialData || {};
+
+    //Execute each node
+    for(const node of sortedNodes){
+      const executor=getExecutor(node.type as NodeType);  
+      context=await executor({
+        data:node.data as Record<string,unknown>,
+        context,
+        nodeId:node.id,
+        step,
+      })
+    }
+    return {sortedNodes};
   },
 );

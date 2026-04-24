@@ -5,14 +5,13 @@ import { GlobeIcon } from "lucide-react";
 import { memo, useState } from "react";
 import { BaseExecutionNode } from "@/features/executions/components/base-execution-node";
 import { ManualTriggerDialog } from "@/features/triggers/components/manual-trigger/dialog";
-import { FormType, HttpRequestDialog } from "./dialog";
+import {  HttpRequestDialog, HTTPRequestFormValues } from "./dialog";
 import { methods } from "better-auth/client";
 
 type HTTPRequestNodeData = {
   endpoint?: string;
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   body?: string;
-  [key: string]: unknown;
 };
 
 type HTTPRequestNodeType = Node<HTTPRequestNodeData>;
@@ -24,7 +23,7 @@ export const HttpRequestNode = memo((props: NodeProps<HTTPRequestNodeType>) => {
 
   const handleOpenSettings = () => setDialogOpen(true);
 
-  const handleSubmit = (values: FormType) => {
+  const handleSubmit = (values: HTTPRequestFormValues) => {
     setNodes((nodes) =>
       nodes.map((node) => {
         if (node.id === props.id) {
@@ -32,9 +31,7 @@ export const HttpRequestNode = memo((props: NodeProps<HTTPRequestNodeType>) => {
             ...node,
             data: {
               ...node.data,
-              endpoint: values.endpoint,
-              method: values.method,
-              body: values.body,
+              ...values,
             },
           };
         }
@@ -53,9 +50,7 @@ export const HttpRequestNode = memo((props: NodeProps<HTTPRequestNodeType>) => {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onSubmit={handleSubmit}
-        defaultEndpoint={nodeData.endpoint}
-        defaultMethod={nodeData.method}
-        defaultBody={nodeData.body}
+        defaultValues={nodeData}
       />
       <BaseExecutionNode
         {...props}
