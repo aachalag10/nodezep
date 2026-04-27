@@ -5,8 +5,10 @@ import { GlobeIcon } from "lucide-react";
 import { memo, useState } from "react";
 import { BaseExecutionNode } from "@/features/executions/components/base-execution-node";
 import { ManualTriggerDialog } from "@/features/triggers/components/manual-trigger/dialog";
-import {  HttpRequestDialog, HTTPRequestFormValues } from "./dialog";
-import { methods } from "better-auth/client";
+import { HttpRequestDialog, HTTPRequestFormValues } from "./dialog";
+import { useNodeStatus } from "../../hooks/use-node-status";
+import { HTTP_REQUEST_CHANNEL_NAME } from "@/inngest/channels/http-request";
+import { fetchHttpRequestRealtimeToken } from "./actions";
 
 type HTTPRequestNodeData = {
   variableName?:string;
@@ -20,7 +22,13 @@ type HTTPRequestNodeType = Node<HTTPRequestNodeData>;
 export const HttpRequestNode = memo((props: NodeProps<HTTPRequestNodeType>) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { setNodes } = useReactFlow();
-  const nodeStatus = "initial";
+
+  const nodeStatus = useNodeStatus({
+    nodeId: props.id,
+    channel: HTTP_REQUEST_CHANNEL_NAME
+    topic: "status",
+    refreshToken: fetchHttpRequestRealtimeToken,
+  });
 
   const handleOpenSettings = () => setDialogOpen(true);
 
@@ -40,6 +48,7 @@ export const HttpRequestNode = memo((props: NodeProps<HTTPRequestNodeType>) => {
       }),
     );
   };
+
   const nodeData = props.data;
   const description = nodeData?.endpoint
     ? `${nodeData.method || "GET"} ${nodeData.endpoint}`
