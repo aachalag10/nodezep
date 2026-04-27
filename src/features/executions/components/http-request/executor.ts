@@ -4,18 +4,12 @@ import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
 import { httpRequestChannel } from "@/inngest/channels/http-request";
 
-Handlebars.registerHelper("json", (context) => {
-  const jsonString = JSON.stringify(context, null, 2);
-  const safeString = new Handlebars.SafeString(stringified);
-
-  return safeString;
-});
-type HTTPRequestData = {
-  variableName: string;
-  endpoint: string;
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  body?: string;
-};
+type HTTPRequestData={
+    variableName?:string;
+    endpoint?:string;
+    method?:"GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    body?:string;
+}
 
 export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
   data,
@@ -30,26 +24,23 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
     }),
   );
 
-  if (!data.endpoint) {
-    await publish(
-        httpRequestChannel().status({
-            nodeId,
-            status:"error",
-        }),
-    ),
-    throw new NonRetriableError("HTTP Request node:No endpoint configured")
-}
+    if(!data.endpoint){
+        throw new NonRetriableError("HTTP Request Node:No endpoint is configured");
+    }
+    if(!data.variableName){
+        throw new NonRetriableError("Variable name not configured");
+    }
+    const result=await step.run("http-request",async()=>{
+        const endpoint=data.endpoint!;
+        const method=data.method || "GET";
 
 
-  if (!data.variableName) {
-    await publish(
-        httpRequestChannel().status({
-            nodeId,
-            status:"error",
-        }),
-    );
-    throw new NonRetriableError("HTTP Request node:Variable name not configured")
-  }
+        if(["POST","PUT","PATCH"].includes(method)){
+            options.body=data.body;  
+            options.headers={
+                "Content-Type":"application/json",
+            }
+        }
 
   if(!data.method){
     await publish(
@@ -61,11 +52,29 @@ export const httpRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
     throw new NonRetriableError("HTTP Request Node:Method not configured")
   }
 
-  try{
-  const result = await step.run("http-request", async () => {
-    const endpoint = Handlebars.compile(data.endpoint)(context);
-    console.log("ENDPOINT", { endpoint });
-    const method = data.method;
+
+        const responsePayload={
+            httpResponse:{
+                status:response.status,
+                statusText:response.statusText,
+                data:responseData,
+            },
+        };
+
+        if(data.variableName){
+
+     
+        return {
+            ...context,
+            [data.variableName]:responsePayload,
+        };
+    }
+    //fallback to direct httpResponse for backward compatibility
+    return{
+        ...context,
+        ...responsePayload,
+    }
+    });
 
     const options: KyOptions = { method };
 
