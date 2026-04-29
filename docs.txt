@@ -20,3 +20,15 @@ workflows.tsx----WorkflowsHeader
       // },
 
 //uncomment this 2 lines for payment procedure
+
+
+
+ ngrok http --url=recipient-student-union.ngrok-free.dev 3000
+
+
+
+Left to do:
+ npx prisma migrate dev
+
+
+ proof it was not monei it was u

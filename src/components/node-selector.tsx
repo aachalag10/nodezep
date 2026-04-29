@@ -32,6 +32,20 @@ const TriggerNodes: NodeTypeOption[] = [
       "Trigger this workflow manually whenever you want.Good for getting started quickly.",
     icon: MousePointerIcon,
   },
+  {
+    type: NodeType.GOOGLE_FORM_TRIGGER,
+    label: "Google Form",
+    description:
+      "Runs the flow when a google form is submitted.",
+    icon: "/logos/google-forms.svg",
+  },
+  {
+    type: NodeType.STRIPE_TRIGGER,
+    label: "Stripe Event",
+    description:
+      "Runs the flow when a stripe event is captured.",
+    icon: "/logos/stripe.svg",
+  },
 ];
 
 const ExecutionNodes: NodeTypeOption[] = [
